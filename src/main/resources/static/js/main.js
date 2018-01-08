@@ -29,7 +29,10 @@ function connect(event) {
         stompClient.connect({}, onConnected, onError);
     }
     event.preventDefault();
+
+
 }
+
 
 
 function onConnected() {
@@ -51,6 +54,21 @@ function onError(error) {
     connectingElement.style.color = 'red';
 }
 
+function move(e){
+
+    var move ={
+        player:{
+            name: username
+        },
+        monster:{
+            id: 1000
+        }
+    }
+    stompClient.send("/app/move", {}, JSON.stringify(move));
+    e.preventDefault();
+}
+
+$('#move').on('click', move);
 
 function sendMessage(event) {
     var messageContent = messageInput.value.trim();
@@ -69,41 +87,53 @@ function sendMessage(event) {
 }
 
 
+
 function onMessageReceived(payload) {
-    var message = JSON.parse(payload.body);
+    //
+  var players = JSON.parse(payload.body).players;
+    players.forEach(function(item, i, arr) {
+        if(item.name == username && item.moving){
+            $('#move').prop('disabled', false);
+        }
+    });
+    // if(payload.body.players = undefined){
+    //     var message = JSON.parse(payload.body.players);
+    //     console.log(message);
+    // }
 
-    var messageElement = document.createElement('li');
 
-    if(message.type === 'JOIN') {
-        messageElement.classList.add('event-message');
-        message.content = message.sender + ' joined!';
-    } else if (message.type === 'LEAVE') {
-        messageElement.classList.add('event-message');
-        message.content = message.sender + ' left!';
-    } else {
-        messageElement.classList.add('chat-message');
-
-        var avatarElement = document.createElement('i');
-        var avatarText = document.createTextNode(message.sender[0]);
-        avatarElement.appendChild(avatarText);
-        avatarElement.style['background-color'] = getAvatarColor(message.sender);
-
-        messageElement.appendChild(avatarElement);
-
-        var usernameElement = document.createElement('span');
-        var usernameText = document.createTextNode(message.sender);
-        usernameElement.appendChild(usernameText);
-        messageElement.appendChild(usernameElement);
-    }
-
-    var textElement = document.createElement('p');
-    var messageText = document.createTextNode(message.content);
-    textElement.appendChild(messageText);
-
-    messageElement.appendChild(textElement);
-
-    messageArea.appendChild(messageElement);
-    messageArea.scrollTop = messageArea.scrollHeight;
+    // var messageElement = document.createElement('li');
+    //
+    // if(message.type === 'JOIN') {
+    //     messageElement.classList.add('event-message');
+    //     message.content = message.sender + ' joined!';
+    // } else if (message.type === 'LEAVE') {
+    //     messageElement.classList.add('event-message');
+    //     message.content = message.sender + ' left!';
+    // } else {
+    //     messageElement.classList.add('chat-message');
+    //
+    //     var avatarElement = document.createElement('i');
+    //     var avatarText = document.createTextNode(message.sender[0]);
+    //     avatarElement.appendChild(avatarText);
+    //     avatarElement.style['background-color'] = getAvatarColor(message.sender);
+    //
+    //     messageElement.appendChild(avatarElement);
+    //
+    //     var usernameElement = document.createElement('span');
+    //     var usernameText = document.createTextNode(message.sender);
+    //     usernameElement.appendChild(usernameText);
+    //     messageElement.appendChild(usernameElement);
+    // }
+    //
+    // var textElement = document.createElement('p');
+    // var messageText = document.createTextNode(message.content);
+    // textElement.appendChild(messageText);
+    //
+    // messageElement.appendChild(textElement);
+    //
+    // messageArea.appendChild(messageElement);
+    // messageArea.scrollTop = messageArea.scrollHeight;
 }
 
 
@@ -117,5 +147,8 @@ function getAvatarColor(messageSender) {
     return colors[index];
 }
 
-usernameForm.addEventListener('submit', connect, true)
-messageForm.addEventListener('submit', sendMessage, true)
+
+usernameForm.addEventListener('submit', connect, true);
+messageForm.addEventListener('submit', sendMessage, true);
+
+
