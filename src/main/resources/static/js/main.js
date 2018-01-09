@@ -24,7 +24,7 @@ function connect(event) {
     if(username == 'a'){
         $('#move').show();
     }
-
+    $('#user-name-id').text(username);
     if(username) {
         usernamePage.classList.add('hidden');
         chatPage.classList.remove('hidden');

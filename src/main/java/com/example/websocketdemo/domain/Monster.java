@@ -14,8 +14,8 @@ public class Monster extends Card implements Door{
     private int truesure;
     private String immorality;
 
-    public Monster(int id, String name,  int level,String description, int truesure, String immorality) {
-        super(id, name, description);
+    public Monster(int id, String name,  int level,String description, int truesure, String immorality, boolean open) {
+        super(id, name, description, open);
         this.level = level;
         this.truesure = truesure;
         this.immorality = immorality;

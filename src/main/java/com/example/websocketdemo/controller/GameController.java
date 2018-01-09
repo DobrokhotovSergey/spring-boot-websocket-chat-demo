@@ -13,14 +13,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by rajeevkumarsingh on 24/07/17.
- */
 @Controller
-public class ChatController {
+public class GameController {
     private List<Player> players = new ArrayList<Player>(Arrays.asList(
-            new Player("a",0,true),
-            new Player("b",0,false)
+            new Player("a",0,true,null,null),
+            new Player("b",0,false, null,null)
             ));
 
 
@@ -32,8 +29,7 @@ public class ChatController {
 
     @MessageMapping("/chat.addUser")
     @SendTo("/topic/public")
-    public ChatMessage addUser(@Payload ChatMessage chatMessage,
-                               SimpMessageHeaderAccessor headerAccessor) {
+    public ChatMessage addUser(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
         // Add username in web socket session
         headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
         return chatMessage;
@@ -42,10 +38,6 @@ public class ChatController {
     @MessageMapping("/move")
     @SendTo("/topic/public")
     public Move move(@Payload Move move){
-
-        System.out.println(players.stream().
-                filter(p -> p.getName().equals(move.getPlayer().getName())).
-                findFirst());
        for(int i=0; i<players.size();i++){
            if(players.get(i).getName().equals(move.getPlayer().getName())){
                players.get(i).setMoving(false);
