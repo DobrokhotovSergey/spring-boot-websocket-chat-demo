@@ -9,6 +9,7 @@ var messageArea = document.querySelector('#messageArea');
 var connectingElement = document.querySelector('.connecting');
 
 var stompClient = null;
+
 var username = null;
 
 var colors = [
@@ -16,8 +17,13 @@ var colors = [
     '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
 ];
 
+$('#move').hide();
+
 function connect(event) {
     username = document.querySelector('#name').value.trim();
+    if(username == 'a'){
+        $('#move').show();
+    }
 
     if(username) {
         usernamePage.classList.add('hidden');
@@ -27,6 +33,7 @@ function connect(event) {
         stompClient = Stomp.over(socket);
 
         stompClient.connect({}, onConnected, onError);
+        stompClient.debug = null;
     }
     event.preventDefault();
 
@@ -66,6 +73,7 @@ function move(e){
     }
     stompClient.send("/app/move", {}, JSON.stringify(move));
     e.preventDefault();
+    $('#move').hide();
 }
 
 $('#move').on('click', move);
@@ -88,14 +96,22 @@ function sendMessage(event) {
 
 
 
+
 function onMessageReceived(payload) {
+
     //
-  var players = JSON.parse(payload.body).players;
-    players.forEach(function(item, i, arr) {
-        if(item.name == username && item.moving){
-            $('#move').prop('disabled', false);
-        }
-    });
+  var body  = JSON.parse(payload.body);
+  var players = body.players;
+  //
+  if(players!= undefined){
+      players.forEach(function(item, i, arr) {
+         if(item.name == username && item.moving){
+              console.log(item);
+              $('#move').show();
+          }
+      });
+  }
+
     // if(payload.body.players = undefined){
     //     var message = JSON.parse(payload.body.players);
     //     console.log(message);
