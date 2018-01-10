@@ -1,10 +1,8 @@
 package com.example.websocketdemo.service;
 
-import com.example.websocketdemo.domain.Card;
-import com.example.websocketdemo.domain.Monster;
-import com.example.websocketdemo.domain.Move;
-import com.example.websocketdemo.domain.Player;
+import com.example.websocketdemo.domain.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,21 +12,23 @@ import java.util.List;
 import static com.example.websocketdemo.domain.InitializeCards.doors;
 
 @Slf4j
+@Service
 public class GameProcessing extends AbstractGameProcessing {
 
     private static final int NUMBER_DOOR_CARD_ON_START =4;
 
+    public GameField start(List<String> list){
 
 
-    public static void main(String[] args) {
-        List<String> stringList = new ArrayList<>(Arrays.asList("Sergey","Anastasia","player1", "player2"));
-        GameProcessing game = new GameProcessing();
-        game.initializeCard();
-        game.initializePlayers(stringList).forEach(s-> {
-            System.out.println(s);
-        });
+        initializeCard();
+        List<Player> playerList = initializePlayers(list);
 
+        GameField gameField = new GameField(playerList, doors, null);
+
+        return gameField;
     }
+
+
 
 
     @Override
@@ -42,11 +42,14 @@ public class GameProcessing extends AbstractGameProcessing {
     List<Player> initializePlayers(List<String> playerList) {
         List<Player> players = new ArrayList<>();
 
+        //Каждый игрок получает по 4 карты двери
         for(int i=0;i<playerList.size();i++){
             List<Card> cardList = new ArrayList<>();
             for(int j =0; j < NUMBER_DOOR_CARD_ON_START; j++){
-                cardList.add(doors.get(i+j));
+                cardList.add(doors.get(0));
+                doors.remove(0);
             }
+
             players.add(new Player(playerList.get(i), 1, false, cardList, null));
         }
 

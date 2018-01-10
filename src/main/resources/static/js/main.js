@@ -45,6 +45,7 @@ function connect(event) {
 function onConnected() {
     // Subscribe to the Public Topic
     stompClient.subscribe('/topic/public', onMessageReceived);
+    stompClient.subscribe('/topic/public/start', startGame);
 
     // Tell your username to the server
     stompClient.send("/app/chat.addUser",
@@ -61,22 +62,22 @@ function onError(error) {
     connectingElement.style.color = 'red';
 }
 
-function move(e){
-
-    var move ={
-        player:{
-            name: username
-        },
-        monster:{
-            id: 1000
-        }
-    }
-    stompClient.send("/app/move", {}, JSON.stringify(move));
-    e.preventDefault();
-    $('#move').hide();
-}
-
-$('#move').on('click', move);
+// function move(e){
+//
+//     var move ={
+//         player:{
+//             name: username
+//         },
+//         monster:{
+//             id: 1000
+//         }
+//     }
+//     stompClient.send("/app/move", {}, JSON.stringify(move));
+//     e.preventDefault();
+//     $('#move').hide();
+// }
+//
+// $('#move').on('click', move);
 
 function sendMessage(event) {
     var messageContent = messageInput.value.trim();
@@ -93,7 +94,22 @@ function sendMessage(event) {
     }
     event.preventDefault();
 }
+function startGame(payload){
 
+        var body  = JSON.parse(payload.body);
+        var filterObj = body.players.filter(function(e) {
+            return e.name == username;
+        });
+        console.log(filterObj);
+        $('#startGame').hide();
+
+}
+$('#startGame').on('click', function(e){
+
+
+    stompClient.send("/app/startGame", {}, {});
+    e.preventDefault();
+});
 
 
 
@@ -101,6 +117,7 @@ function onMessageReceived(payload) {
 
     //
   var body  = JSON.parse(payload.body);
+  console.log(body);
   var players = body.players;
   //
   if(players!= undefined){
@@ -165,6 +182,6 @@ function getAvatarColor(messageSender) {
 
 
 usernameForm.addEventListener('submit', connect, true);
-messageForm.addEventListener('submit', sendMessage, true);
+// messageForm.addEventListener('submit', sendMessage, true);
 
 
