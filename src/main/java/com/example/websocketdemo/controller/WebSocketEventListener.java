@@ -1,6 +1,6 @@
 package com.example.websocketdemo.controller;
 
-import com.example.websocketdemo.model.ChatMessage;
+import com.example.websocketdemo.domain.ConnectInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,10 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
+import java.util.HashSet;
+
+import static com.example.websocketdemo.controller.GameController.players;
 
 @Component
 public class WebSocketEventListener {
@@ -32,11 +36,11 @@ public class WebSocketEventListener {
         if(username != null) {
             logger.info("User Disconnected : " + username);
 
-            ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setType(ChatMessage.MessageType.LEAVE);
-            chatMessage.setSender(username);
-
-            messagingTemplate.convertAndSend("/topic/public", chatMessage);
+            ConnectInfo info = new ConnectInfo();
+            info.setType(ConnectInfo.ConnectingType.LEAVE);
+            info.setSender(username);
+            players = new HashSet<>();
+            messagingTemplate.convertAndSend("/topic/public", info);
         }
     }
 }

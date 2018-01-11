@@ -79,21 +79,7 @@ function onError(error) {
 //
 // $('#move').on('click', move);
 
-function sendMessage(event) {
-    var messageContent = messageInput.value.trim();
 
-    if(messageContent && stompClient) {
-        var chatMessage = {
-            sender: username,
-            content: messageInput.value,
-            type: 'CHAT'
-        };
-
-        stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
-        messageInput.value = '';
-    }
-    event.preventDefault();
-}
 function startGame(payload){
 
         var body  = JSON.parse(payload.body);
@@ -105,8 +91,6 @@ function startGame(payload){
 
 }
 $('#startGame').on('click', function(e){
-
-
     stompClient.send("/app/startGame", {}, {});
     e.preventDefault();
 });
@@ -114,6 +98,33 @@ $('#startGame').on('click', function(e){
 
 
 function onMessageReceived(payload) {
+    var message = JSON.parse(payload.body);
+    var lobbyPlayers = '';
+    message.allPlayers.forEach(function(item, i, arr){
+        lobbyPlayers+='<li class="list-group-item">'+item+'</li>';
+    });
+    $('#list-lobby').html(lobbyPlayers);
+// <li class="list-group-item">aaaa</li>
+    console.log(message.allPlayers);
+
+    var messageElement = document.createElement('li');
+
+    if(message.type === 'JOIN') {
+        messageElement.classList.add('event-message');
+        message.content = message.sender + ' joined!';
+    } else if (message.type === 'LEAVE') {
+        messageElement.classList.add('event-message');
+        message.content = message.sender + ' left!';
+    }
+    var textElement = document.createElement('p');
+    var messageText = document.createTextNode(message.content);
+    textElement.appendChild(messageText);
+
+    messageElement.appendChild(textElement);
+
+    messageArea.appendChild(messageElement);
+    messageArea.scrollTop = messageArea.scrollHeight;
+
 
     //
   var body  = JSON.parse(payload.body);
@@ -182,6 +193,5 @@ function getAvatarColor(messageSender) {
 
 
 usernameForm.addEventListener('submit', connect, true);
-// messageForm.addEventListener('submit', sendMessage, true);
 
 

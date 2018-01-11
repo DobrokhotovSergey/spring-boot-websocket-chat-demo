@@ -5,25 +5,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static com.example.websocketdemo.domain.InitializeCards.doors;
 
 @Slf4j
 @Service
 public class GameProcessing extends AbstractGameProcessing {
 
     private static final int NUMBER_DOOR_CARD_ON_START =4;
+    private static final int NUMBER_TREASURE_CARD_ON_START =4;
+    private static List<Card> doorsInGames = InitializeCards.doors;
+
 
     public GameField start(List<String> list){
-
-
         initializeCard();
         List<Player> playerList = initializePlayers(list);
 
-        GameField gameField = new GameField(playerList, doors, null);
+        GameField gameField = new GameField(playerList, doorsInGames, null);
 
         return gameField;
     }
@@ -33,7 +31,7 @@ public class GameProcessing extends AbstractGameProcessing {
 
     @Override
     void initializeCard() {
-        Collections.shuffle(doors);
+        Collections.shuffle(doorsInGames);
     }
 
 
@@ -46,8 +44,8 @@ public class GameProcessing extends AbstractGameProcessing {
         for(int i=0;i<playerList.size();i++){
             List<Card> cardList = new ArrayList<>();
             for(int j =0; j < NUMBER_DOOR_CARD_ON_START; j++){
-                cardList.add(doors.get(0));
-                doors.remove(0);
+                cardList.add(doorsInGames.get(0));
+                doorsInGames.remove(0);
             }
 
             players.add(new Player(playerList.get(i), 1, false, cardList, null));
@@ -58,7 +56,7 @@ public class GameProcessing extends AbstractGameProcessing {
 
 //        В самом начале игроки определяют, кто будет ходить первым.
 //                Каждый игрок получает по 4 карты двери и 4 карты сокровищ.
-//        Перед ходом первого игрока все могут сыграть необходимые им карты (например шмотки, "получи уровень") и игра начинается.
+//        Перед ходом первого игрока все м  огут сыграть необходимые им карты (например шмотки, "получи уровень") и игра начинается.
 //        (Проклятия нельзя играть до начала хода первого игрока.)
 
     }

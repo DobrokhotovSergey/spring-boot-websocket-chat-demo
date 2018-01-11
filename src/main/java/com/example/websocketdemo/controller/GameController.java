@@ -1,9 +1,7 @@
 package com.example.websocketdemo.controller;
 
+import com.example.websocketdemo.domain.ConnectInfo;
 import com.example.websocketdemo.domain.GameField;
-import com.example.websocketdemo.domain.Move;
-import com.example.websocketdemo.domain.Player;
-import com.example.websocketdemo.model.ChatMessage;
 import com.example.websocketdemo.service.GameProcessing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -20,29 +18,22 @@ public class GameController {
     @Autowired
     private GameProcessing gameProcessing;
 
-    private Set<String> players = new HashSet<>();
-
-
-//    @MessageMapping("/chat.sendMessage")
-//    @SendTo("/topic/public")
-//    public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
-//        return chatMessage;
-//    }
+    public static Set<String> players = new HashSet<>();
 
     @MessageMapping("/chat.addUser")
     @SendTo("/topic/public")
-    public ChatMessage addUser(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
-        // Add username in web socket session
-        headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
-        players.add(chatMessage.getSender());
-        return chatMessage;
+    public ConnectInfo addUser(@Payload ConnectInfo info, SimpMessageHeaderAccessor headerAccessor) {
+        headerAccessor.getSessionAttributes().put("username", info.getSender());
+        players.add(info.getSender());
+        info.setAllPlayers(players);
+        return info;
     }
+
 
     @MessageMapping("/startGame")
     @SendTo("/topic/public/start")
     public GameField start(){
-        System.out.println(players);
-        return gameProcessing.start(new ArrayList<>(players));
+        return new GameProcessing().start(new ArrayList<>(players));
     }
 
 //    @MessageMapping("/move")
