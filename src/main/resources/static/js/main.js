@@ -98,13 +98,13 @@ $('#startGame').on('click', function(e){
 
 
 function onMessageReceived(payload) {
+    $('#lobby-container').show();
     var message = JSON.parse(payload.body);
     var lobbyPlayers = '';
     message.allPlayers.forEach(function(item, i, arr){
-        lobbyPlayers+='<li class="fa fa-user list-group-item"> '+item+' </li>';
+        lobbyPlayers+='<li class="fa fa-user list-group-item" style="color: '+ getAvatarColor(item)+'"> '+item+' </li>';
     });
     $('#list-lobby').html(lobbyPlayers);
-// <li class="list-group-item">aaaa</li>
     console.log(message.allPlayers);
 
     var messageElement = document.createElement('li');

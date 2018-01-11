@@ -9,17 +9,34 @@
   </head>
   <body>
 
-  <div class="container">
+  <div class="container" id="lobby-container" style="display: none">
       <div class="panel panel-default">
           <div class="panel-heading">
               <h3 class="panel-title fa fa-users" > Game Lobby</h3>
           </div>
 
           <div class="panel-body">
-              <ul class="list-group">
 
-                  <span id="list-lobby"></span>
-              </ul>
+              <table class="table table-bordered">
+                  <tbody>
+                  <tr>
+                      <td>
+                          <ul class="list-group">
+                              <span id="list-lobby"></span>
+                          </ul>
+                      </td>
+                      <td>
+                          <ul id="messageArea">
+
+                          </ul>
+                      </td>
+                  </tr>
+                  </tbody>
+              </table>
+
+
+
+              <button id="startGame" class="btn btn-default">START NEW GAME</button>
           </div>
       </div>
   </div>
@@ -42,16 +59,14 @@
 
         <div class="chat-container">
             <div class="chat-header">
-                <button id="startGame">START NEW GAME</button>
+
                 <!--<button id="move">MOVE</button>-->
                 <div id="user-name-id"></div>
             </div>
             <div class="connecting">
                 Connecting...
             </div>
-            <ul id="messageArea">
 
-            </ul>
         </div>
     </div>
 
