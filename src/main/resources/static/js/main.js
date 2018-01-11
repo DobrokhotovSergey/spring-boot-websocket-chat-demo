@@ -101,7 +101,7 @@ function onMessageReceived(payload) {
     var message = JSON.parse(payload.body);
     var lobbyPlayers = '';
     message.allPlayers.forEach(function(item, i, arr){
-        lobbyPlayers+='<li class="list-group-item">'+item+'</li>';
+        lobbyPlayers+='<li class="fa fa-user list-group-item"> '+item+' </li>';
     });
     $('#list-lobby').html(lobbyPlayers);
 // <li class="list-group-item">aaaa</li>
