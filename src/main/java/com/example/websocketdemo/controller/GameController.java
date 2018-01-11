@@ -2,6 +2,7 @@ package com.example.websocketdemo.controller;
 
 import com.example.websocketdemo.domain.ConnectInfo;
 import com.example.websocketdemo.domain.GameField;
+import com.example.websocketdemo.domain.Room;
 import com.example.websocketdemo.service.GameProcessing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -23,6 +24,7 @@ public class GameController {
     private SimpMessagingTemplate template;
 
     public static Set<String> players = new HashSet<>();
+    private Set<Room> lobbys = new HashSet<>();
 
     @MessageMapping("/chat.addUser")
     @SendTo("/topic/public")
@@ -36,13 +38,31 @@ public class GameController {
         this.template = template;
     }
 
+    @MessageMapping("/getrooms/{user}")
+    public void getAllRoom(@DestinationVariable("user") String user){
+        this.template.convertAndSend("/topic/getrooms/"+user, lobbys);
+    }
+
+    @MessageMapping("/create/{room}")
+    public void createRoom(@DestinationVariable("room") String room, @Payload ConnectInfo info) throws Exception {
+        Room r = new Room(room, info.getSender());
+        players.add(info.getSender());
+        info.setAllPlayers(players);
+        if(!lobbys.contains(r)){
+            lobbys.add(r);
+        }else{
+            System.out.println("lobbys contains this room!");
+        }
+        this.template.convertAndSend("/topic/create/"+room, info);
+    }
+
     @MessageMapping("/room/{room}")
-    public void greet(@DestinationVariable("room") String room, @Payload ConnectInfo info) throws Exception {
+    public void connectToRoom(@DestinationVariable("room") String room, @Payload ConnectInfo info) throws Exception {
         System.out.println(room);
         System.out.println(info);
         players.add(info.getSender());
         info.setAllPlayers(players);
-       this.template.convertAndSend("/topic/room/"+room, info);
+        this.template.convertAndSend("/topic/room/"+room, info);
     }
 
     @MessageMapping("/startGame")

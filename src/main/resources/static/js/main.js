@@ -41,43 +41,85 @@ function connect(event) {
 
 
 }
+
+function connectToRoom(info){
+    $('#lobby-container').show();
+    var message = JSON.parse(info.body);
+    var lobbyPlayers = '';
+    message.allPlayers.forEach(function(item, i, arr){
+        lobbyPlayers+='<li class="fa fa-user list-group-item" style="color: '+ getAvatarColor(item)+'"> '+item+' </li>';
+    });
+    $('#list-lobby').html(lobbyPlayers);
+    console.log(message.allPlayers);
+
+    var messageElement = document.createElement('li');
+
+    if(message.type === 'JOIN') {
+        messageElement.classList.add('event-message');
+        message.content = message.sender + ' joined!';
+    } else if (message.type === 'LEAVE') {
+        messageElement.classList.add('event-message');
+        message.content = message.sender + ' left!';
+    }
+    var textElement = document.createElement('p');
+    var messageText = document.createTextNode(message.content);
+    textElement.appendChild(messageText);
+
+    messageElement.appendChild(textElement);
+
+    messageArea.appendChild(messageElement);
+    messageArea.scrollTop = messageArea.scrollHeight;
+}
+var findGameTable = $('#findGame-table').DataTable({
+    destroy: true,
+    autoWidth: false,
+    columnDefs: [{},{},{}],
+});
+$('#findGame-table tbody').on('click', 'tr td .join-btn', function(e){
+    var data = findGameTable.row( $(this).parents('tr') ).data();
+    console.log(data);
+    stompClient.send("/app/room/"+data[0], {}, JSON.stringify({sender: username, type: 'JOIN'}));
+    stompClient.subscribe('/topic/room/{room}', function(info) {
+        $('#findGame-modal').modal('hide');
+        $('#menu-after-connected').hide();
+        connectToRoom(info);
+    });
+    e.preventDefault();
+});
+
+$('#findGame-btn').on('click', function(e){
+    stompClient.send("/app/getrooms/"+username, {}, {});
+    stompClient.subscribe('/topic/getrooms/{user}', function(info) {
+        $('#findGame-modal').modal('show');
+
+      var data = JSON.parse(info.body);
+      console.log(data);
+        findGameTable.clear().draw();
+        var rows = [];
+        data.forEach(function(item, i, arr) {
+            rows[i] = [item.name, item.owner, '<button type="button" class="join-btn" class="btn btn-default">клик</button>'];
+        });
+        findGameTable.rows.add(rows).draw();
+    });
+    e.preventDefault();
+});
+
 $('#createGame-modal-btn').on('click', function(e){
 
     var gameName = $('#createGame-input').val();
-    stompClient.send("/app/room/"+gameName,
-        {},
-        JSON.stringify({sender: username, type: 'JOIN'})
+    stompClient.send("/app/create/"+gameName, {}, JSON.stringify({sender: username, type: 'JOIN'})
     );
-    stompClient.subscribe('/topic/room/{room}', function(info) {
+    stompClient.subscribe('/topic/create/{room}', function(info) {
         $('#createGame-modal').modal('hide');
         $('#menu-after-connected').hide();
-        $('#lobby-container').show();
-        var message = JSON.parse(info.body);
-        var lobbyPlayers = '';
-        message.allPlayers.forEach(function(item, i, arr){
-            lobbyPlayers+='<li class="fa fa-user list-group-item" style="color: '+ getAvatarColor(item)+'"> '+item+' </li>';
-        });
-        $('#list-lobby').html(lobbyPlayers);
-        console.log(message.allPlayers);
-
-        var messageElement = document.createElement('li');
-
-        if(message.type === 'JOIN') {
-            messageElement.classList.add('event-message');
-            message.content = message.sender + ' joined!';
-        } else if (message.type === 'LEAVE') {
-            messageElement.classList.add('event-message');
-            message.content = message.sender + ' left!';
-        }
-        var textElement = document.createElement('p');
-        var messageText = document.createTextNode(message.content);
-        textElement.appendChild(messageText);
-
-        messageElement.appendChild(textElement);
-
-        messageArea.appendChild(messageElement);
-        messageArea.scrollTop = messageArea.scrollHeight;
+        console.log(info);
+        connectToRoom(info);
     });
+
+    stompClient.subscribe('/topic/room/{room}', function(info) {
+        connectToRoom(info);
+    });
+
     e.preventDefault();
 });
 
