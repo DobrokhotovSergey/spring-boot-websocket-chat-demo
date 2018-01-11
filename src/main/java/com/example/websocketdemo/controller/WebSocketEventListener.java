@@ -39,7 +39,6 @@ public class WebSocketEventListener {
             ConnectInfo info = new ConnectInfo();
             info.setType(ConnectInfo.ConnectingType.LEAVE);
             info.setSender(username);
-            players = new HashSet<>();
             messagingTemplate.convertAndSend("/topic/public", info);
         }
     }

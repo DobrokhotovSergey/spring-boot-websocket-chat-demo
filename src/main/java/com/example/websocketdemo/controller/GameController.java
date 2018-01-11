@@ -4,10 +4,12 @@ import com.example.websocketdemo.domain.ConnectInfo;
 import com.example.websocketdemo.domain.GameField;
 import com.example.websocketdemo.service.GameProcessing;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.util.*;
@@ -18,17 +20,30 @@ public class GameController {
     @Autowired
     private GameProcessing gameProcessing;
 
+    private SimpMessagingTemplate template;
+
     public static Set<String> players = new HashSet<>();
 
     @MessageMapping("/chat.addUser")
     @SendTo("/topic/public")
     public ConnectInfo addUser(@Payload ConnectInfo info, SimpMessageHeaderAccessor headerAccessor) {
         headerAccessor.getSessionAttributes().put("username", info.getSender());
-        players.add(info.getSender());
-        info.setAllPlayers(players);
         return info;
     }
 
+    @Autowired
+    public GameController(SimpMessagingTemplate template) {
+        this.template = template;
+    }
+
+    @MessageMapping("/room/{room}")
+    public void greet(@DestinationVariable("room") String room, @Payload ConnectInfo info) throws Exception {
+        System.out.println(room);
+        System.out.println(info);
+        players.add(info.getSender());
+        info.setAllPlayers(players);
+       this.template.convertAndSend("/topic/room/"+room, info);
+    }
 
     @MessageMapping("/startGame")
     @SendTo("/topic/public/start")

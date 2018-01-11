@@ -5,14 +5,56 @@
       <title>Манчкин</title>
       <link rel="stylesheet" href="/css/bootstrap.css" />
       <link rel="stylesheet" href="/css/font-awesome.css">
+
       <!--<link rel="stylesheet" href="/css/main.css" />-->
   </head>
   <body>
+  <div class="modal fade" id="createGame-modal" role="dialog">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Начать новую игру</h4>
+              </div>
+              <div class="modal-body">
+                  <input type="text" class="form-control" id="createGame-input">
+              </div>
+              <div class="modal-footer">
+                  <button type="button" id="createGame-modal-btn" class="btn btn-default">Создать</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+              </div>
+          </div>
+
+      </div>
+  </div>
+  <div class="modal fade" id="findGame-modal" role="dialog">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Список доступных</h4>
+              </div>
+              <div class="modal-body">
+                 <span id="findGame-table"></span>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+              </div>
+          </div>
+
+      </div>
+  </div>
+
+
+  <div id="menu-after-connected" style="display: none">
+      <button id="createGame-btn" class="btn btn-default">Начать новую игру</button>
+      <button id="findGame-btn" class="btn btn-default">Найти игры</button>
+  </div>
 
   <div class="container" id="lobby-container" style="display: none">
       <div class="panel panel-default">
           <div class="panel-heading">
-              <h3 class="panel-title fa fa-users" > Game Lobby</h3>
+              <h3 class="panel-title fa fa-users" > Игроки в лобби </h3>
           </div>
 
           <div class="panel-body">
@@ -36,7 +78,7 @@
 
 
 
-              <button id="startGame" class="btn btn-default">START NEW GAME</button>
+
           </div>
       </div>
   </div>
@@ -73,6 +115,7 @@
     <script src="/js/sockjs.min.js"></script>
     <script src="/js/stomp.min.js"></script>
     <script src="/js/jquery-2.2.3.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="/js/main.js"></script>
   </body>
 </html>

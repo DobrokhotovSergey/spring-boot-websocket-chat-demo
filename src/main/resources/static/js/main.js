@@ -35,24 +35,70 @@ function connect(event) {
         stompClient.connect({}, onConnected, onError);
         stompClient.debug = null;
     }
+
+
     event.preventDefault();
 
 
 }
+$('#createGame-modal-btn').on('click', function(e){
 
-
-
-function onConnected() {
-    // Subscribe to the Public Topic
-    stompClient.subscribe('/topic/public', onMessageReceived);
-    stompClient.subscribe('/topic/public/start', startGame);
-
-    // Tell your username to the server
-    stompClient.send("/app/chat.addUser",
+    var gameName = $('#createGame-input').val();
+    stompClient.send("/app/room/"+gameName,
         {},
         JSON.stringify({sender: username, type: 'JOIN'})
-    )
+    );
+    stompClient.subscribe('/topic/room/{room}', function(info) {
+        $('#createGame-modal').modal('hide');
+        $('#menu-after-connected').hide();
+        $('#lobby-container').show();
+        var message = JSON.parse(info.body);
+        var lobbyPlayers = '';
+        message.allPlayers.forEach(function(item, i, arr){
+            lobbyPlayers+='<li class="fa fa-user list-group-item" style="color: '+ getAvatarColor(item)+'"> '+item+' </li>';
+        });
+        $('#list-lobby').html(lobbyPlayers);
+        console.log(message.allPlayers);
 
+        var messageElement = document.createElement('li');
+
+        if(message.type === 'JOIN') {
+            messageElement.classList.add('event-message');
+            message.content = message.sender + ' joined!';
+        } else if (message.type === 'LEAVE') {
+            messageElement.classList.add('event-message');
+            message.content = message.sender + ' left!';
+        }
+        var textElement = document.createElement('p');
+        var messageText = document.createTextNode(message.content);
+        textElement.appendChild(messageText);
+
+        messageElement.appendChild(textElement);
+
+        messageArea.appendChild(messageElement);
+        messageArea.scrollTop = messageArea.scrollHeight;
+    });
+    e.preventDefault();
+});
+
+$('#createGame-btn').on('click', function(){
+    $('#createGame-modal').modal('show');
+});
+
+function onConnected() {
+
+    $('#menu-after-connected').show();
+
+    // Subscribe to the Public Topic
+    // stompClient.subscribe('/topic/public', onMessageReceived);
+    // stompClient.subscribe('/topic/public/start', startGame);
+
+    // Tell your username to the server
+    stompClient.send("/app/chat.addUser", {}, JSON.stringify({sender: username, type: 'JOIN'}));
+
+
+
+    // stompClient.send("/app/startGame", {}, {});
     connectingElement.classList.add('hidden');
 }
 
@@ -98,32 +144,8 @@ $('#startGame').on('click', function(e){
 
 
 function onMessageReceived(payload) {
-    $('#lobby-container').show();
-    var message = JSON.parse(payload.body);
-    var lobbyPlayers = '';
-    message.allPlayers.forEach(function(item, i, arr){
-        lobbyPlayers+='<li class="fa fa-user list-group-item" style="color: '+ getAvatarColor(item)+'"> '+item+' </li>';
-    });
-    $('#list-lobby').html(lobbyPlayers);
-    console.log(message.allPlayers);
 
-    var messageElement = document.createElement('li');
 
-    if(message.type === 'JOIN') {
-        messageElement.classList.add('event-message');
-        message.content = message.sender + ' joined!';
-    } else if (message.type === 'LEAVE') {
-        messageElement.classList.add('event-message');
-        message.content = message.sender + ' left!';
-    }
-    var textElement = document.createElement('p');
-    var messageText = document.createTextNode(message.content);
-    textElement.appendChild(messageText);
-
-    messageElement.appendChild(textElement);
-
-    messageArea.appendChild(messageElement);
-    messageArea.scrollTop = messageArea.scrollHeight;
 
 
     //
@@ -139,45 +161,6 @@ function onMessageReceived(payload) {
           }
       });
   }
-
-    // if(payload.body.players = undefined){
-    //     var message = JSON.parse(payload.body.players);
-    //     console.log(message);
-    // }
-
-
-    // var messageElement = document.createElement('li');
-    //
-    // if(message.type === 'JOIN') {
-    //     messageElement.classList.add('event-message');
-    //     message.content = message.sender + ' joined!';
-    // } else if (message.type === 'LEAVE') {
-    //     messageElement.classList.add('event-message');
-    //     message.content = message.sender + ' left!';
-    // } else {
-    //     messageElement.classList.add('chat-message');
-    //
-    //     var avatarElement = document.createElement('i');
-    //     var avatarText = document.createTextNode(message.sender[0]);
-    //     avatarElement.appendChild(avatarText);
-    //     avatarElement.style['background-color'] = getAvatarColor(message.sender);
-    //
-    //     messageElement.appendChild(avatarElement);
-    //
-    //     var usernameElement = document.createElement('span');
-    //     var usernameText = document.createTextNode(message.sender);
-    //     usernameElement.appendChild(usernameText);
-    //     messageElement.appendChild(usernameElement);
-    // }
-    //
-    // var textElement = document.createElement('p');
-    // var messageText = document.createTextNode(message.content);
-    // textElement.appendChild(messageText);
-    //
-    // messageElement.appendChild(textElement);
-    //
-    // messageArea.appendChild(messageElement);
-    // messageArea.scrollTop = messageArea.scrollHeight;
 }
 
 
