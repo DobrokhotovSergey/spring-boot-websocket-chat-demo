@@ -42,15 +42,13 @@ function connect(event) {
 function connectToRoom(info){
 
     $('#lobby-container').show();
-
-    var message = JSON.parse(info.body);
-    $('#lobby-id').text(message.name);
-
     stompClient.subscribe('/topic/public/'+$('#lobby-id').text(), function(i) {
         var t = JSON.parse(i.body);
         var leave = '#lobby-player-' + t.sender;
         $(leave).remove();
     });
+    var message = JSON.parse(info.body);
+    $('#lobby-id').text(message.name);
 
     var lobbyPlayers = '';
     var messageElement = document.createElement('li');
@@ -62,7 +60,6 @@ function connectToRoom(info){
     $('#messageArea').empty();
 
     message.allPlayers.forEach(function(item, i, arr){
-        console.log(item);
         if(item.type === 'JOIN') {
             messageElement.classList.add('event-message');
             item.content = item.sender + ' присоединился!';
@@ -89,9 +86,7 @@ var findGameTable = $('#findGame-table').DataTable({
 });
 $('#findGame-table tbody').on('click', 'tr td .join-btn', function(e){
     var data = findGameTable.row( $(this).parents('tr') ).data();
-    console.log(data);
     stompClient.send("/app/room/"+data[1], {}, JSON.stringify({sender: username, type: 'JOIN'}));
-
     e.preventDefault();
 });
 
@@ -106,8 +101,9 @@ $('#createGame-modal-btn').on('click', function(e){
     e.preventDefault();
 });
 
-$('#createGame-btn').on('click', function(){
+$('#createGame-btn').on('click', function(e){
     $('#createGame-modal').modal('show');
+    e.preventDefault();
 });
 
 function onConnected() {

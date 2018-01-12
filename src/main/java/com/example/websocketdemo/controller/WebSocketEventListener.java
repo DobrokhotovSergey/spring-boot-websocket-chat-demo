@@ -39,7 +39,9 @@ public class WebSocketEventListener {
                        ConnectInfo info = new ConnectInfo();
                        info.setType(ConnectInfo.ConnectingType.LEAVE);
                        info.setSender(username);
-                       messagingTemplate.convertAndSend("/topic/public/"+  room.getName(), info);
+                       String rooms = room.getName();
+                       lobbys.remove(rooms);
+                       messagingTemplate.convertAndSend("/topic/public/"+ rooms, info);
                    }
                 }
             }
