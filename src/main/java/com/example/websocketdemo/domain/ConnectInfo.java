@@ -11,6 +11,7 @@ public class ConnectInfo {
     private String content;
     private String sender;
     private Set<String> allPlayers;
+    private boolean ready;
 
     public enum ConnectingType {
         JOIN,

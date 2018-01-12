@@ -116,7 +116,13 @@ $('#createGame-btn').on('click', function(e){
     $('#createGame-modal').modal('show');
     e.preventDefault();
 });
-
+$('#start-newGame-btn').on('click', function(e){
+    console.log('start-newGame');
+    var roomId =$('#lobby-id').text();
+    console.log(roomId);
+    stompClient.send("/app/ready/"+roomId, {}, {});
+    e.preventDefault();
+});
 function onConnected() {
 
     $('#menu-after-connected').show();
@@ -128,18 +134,34 @@ function onConnected() {
     });
 
     stompClient.subscribe('/topic/room/{room}', function(info) {
-        console.log(JSON.stringify(info.body));
         $('#findGame-modal').modal('hide');
         $('#menu-after-connected').hide();
         connectToRoom(info);
     });
 
-    stompClient.subscribe('/topic/room/{room}', function(info) {
-        console.log(JSON.stringify(info.body));
-        $('#findGame-modal').modal('hide');
-        $('#menu-after-connected').hide();
-        connectToRoom(info);
-    });
+    stompClient.subscribe('/topic/ready/{room}', function(info) {
+        var data = JSON.parse(info.body);
+
+        data.allPlayers.forEach(function(item, i, arr) {
+            if(item.ready){
+                 $('#lobby-player-'+item.sender).css("background-color", "#afd896");
+            }
+        });
+        if(data.start){
+            $("#countdown").countdown360({
+                radius      : 60,
+                seconds     : 5,
+                fontColor   : '#FFFFFF',
+                autostart   : false,
+                label       : false,
+                onComplete  : function () {
+                    console.log('BEGIN') }
+                }).start()
+
+        }
+
+
+        });
 
     stompClient.subscribe('/user/topic/getrooms/{user}', function(info) {
         $('#findGame-modal').modal('show');
@@ -151,15 +173,7 @@ function onConnected() {
         });
         findGameTable.rows.add(rows).draw();
     });
-
-
-
-
     stompClient.send("/app/chat.addUser", {}, JSON.stringify({sender: username, type: 'JOIN'}));
-
-
-
-    // stompClient.send("/app/startGame", {}, {});
     connectingElement.classList.add('hidden');
 }
 

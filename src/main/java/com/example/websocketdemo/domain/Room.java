@@ -13,4 +13,5 @@ public class Room {
     private String name;
     private ConnectInfo owner;
     private Set<ConnectInfo> allPlayers;
+    private boolean start;
 }

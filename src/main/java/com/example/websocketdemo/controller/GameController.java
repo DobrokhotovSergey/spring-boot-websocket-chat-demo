@@ -2,6 +2,7 @@ package com.example.websocketdemo.controller;
 
 import com.example.websocketdemo.domain.ConnectInfo;
 import com.example.websocketdemo.domain.GameField;
+import com.example.websocketdemo.domain.Player;
 import com.example.websocketdemo.domain.Room;
 import com.example.websocketdemo.service.GameProcessing;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class GameController {
 
     @MessageMapping("/create/{room}")
     public void createRoom(@DestinationVariable("room") String room, @Payload ConnectInfo owner, User user) throws Exception {
-        Room r = new Room(room, owner,  new HashSet<>(Arrays.asList(owner)));
+        Room r = new Room(room, owner,  new HashSet<>(Arrays.asList(owner)), false);
         lobbys.put(user.getName(), r);
         this.template.convertAndSendToUser(user.getName(), "/topic/create/"+room, r);
     }
@@ -54,6 +55,34 @@ public class GameController {
     public void connectToRoom(@DestinationVariable("room") String room, @Payload ConnectInfo info, User user) throws Exception {
         lobbys.get(room).getAllPlayers().add(info);
         this.template.convertAndSend("/topic/room/"+room, lobbys.get(room));
+    }
+
+    @MessageMapping("/ready/{room}")
+    public void ready(@DestinationVariable("room") String room, User user){
+        String owner = null;
+        for(Room rooms:lobbys.values()){
+            if(rooms.getName().equals(room)){
+                for(ConnectInfo connectInfo: rooms.getAllPlayers()){
+                    if (connectInfo.getSender().equals(user.getName())){
+                        connectInfo.setReady(true);
+                        owner = rooms.getOwner().getSender();
+                    }
+                }
+            }
+        }
+        boolean start = true;
+        for(Room room1: lobbys.values()){
+            if(room1.getName().equals(room)){
+                for(ConnectInfo connectInfo: room1.getAllPlayers()){
+                    if(!connectInfo.isReady()){
+                        start = false;
+                    }
+                }
+            }
+        }
+        Room r = lobbys.get(owner);
+        r.setStart(start);
+        this.template.convertAndSend("/topic/ready/"+room, r);
     }
 
     @MessageMapping("/startGame")
