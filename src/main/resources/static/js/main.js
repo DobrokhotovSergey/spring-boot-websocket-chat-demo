@@ -44,15 +44,18 @@ function connectToRoom(info){
     $('#lobby-container').show();
 
     var message = JSON.parse(info.body);
+    $('#lobby-id').text(message.name);
 
-    stompClient.subscribe('/topic/public/'+$('#lobby-id').text(), function(info) {
-        console.log(info);
+    stompClient.subscribe('/topic/public/'+$('#lobby-id').text(), function(i) {
+        var t = JSON.parse(i.body);
+        var leave = '#lobby-player-' + t.sender;
+        $(leave).remove();
     });
 
     var lobbyPlayers = '';
     var messageElement = document.createElement('li');
     message.allPlayers.forEach(function(item, i, arr){
-        lobbyPlayers+='<li class="fa fa-user list-group-item" style="color: '+ getAvatarColor(item.sender)+'"> '+item.sender+' </li>';
+        lobbyPlayers+='<li class="fa fa-user list-group-item" id=lobby-player-'+item.sender+' style="color: '+ getAvatarColor(item.sender)+'"> '+item.sender+' </li>';
     });
     $('#list-lobby').html(lobbyPlayers);
 
