@@ -40,8 +40,15 @@ function connect(event) {
 }
 
 function connectToRoom(info){
+
     $('#lobby-container').show();
+
     var message = JSON.parse(info.body);
+
+    stompClient.subscribe('/topic/public/'+$('#lobby-id').text(), function(info) {
+        console.log(info);
+    });
+
     var lobbyPlayers = '';
     var messageElement = document.createElement('li');
     message.allPlayers.forEach(function(item, i, arr){
@@ -117,6 +124,13 @@ function onConnected() {
         connectToRoom(info);
     });
 
+    stompClient.subscribe('/topic/room/{room}', function(info) {
+        console.log(JSON.stringify(info.body));
+        $('#findGame-modal').modal('hide');
+        $('#menu-after-connected').hide();
+        connectToRoom(info);
+    });
+
     stompClient.subscribe('/user/topic/getrooms/{user}', function(info) {
         $('#findGame-modal').modal('show');
         var data = JSON.parse(info.body);
@@ -129,9 +143,7 @@ function onConnected() {
     });
 
 
-    stompClient.subscribe('/topic/public/{room}', function(info) {
-       console.log(info);
-    });
+
 
     stompClient.send("/app/chat.addUser", {}, JSON.stringify({sender: username, type: 'JOIN'}));
 

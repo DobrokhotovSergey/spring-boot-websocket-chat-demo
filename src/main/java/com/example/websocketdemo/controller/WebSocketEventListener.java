@@ -1,6 +1,7 @@
 package com.example.websocketdemo.controller;
 
 import com.example.websocketdemo.domain.ConnectInfo;
+import com.example.websocketdemo.domain.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +30,19 @@ public class WebSocketEventListener {
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-
         String username = (String) headerAccessor.getSessionAttributes().get("username");
         if(username != null) {
             logger.info("User Disconnected : " + username);
-
-            ConnectInfo info = new ConnectInfo();
-            info.setType(ConnectInfo.ConnectingType.LEAVE);
-            info.setSender(username);
-
-            messagingTemplate.convertAndSend("/topic/public/"+  lobbys.get(username).getName(), info);
+            for(Room room: lobbys.values()){
+                for(ConnectInfo connectInfo: room.getAllPlayers()){
+                   if( connectInfo.getSender().equals(username)){
+                       ConnectInfo info = new ConnectInfo();
+                       info.setType(ConnectInfo.ConnectingType.LEAVE);
+                       info.setSender(username);
+                       messagingTemplate.convertAndSend("/topic/public/"+  room.getName(), info);
+                   }
+                }
+            }
         }
     }
 }
