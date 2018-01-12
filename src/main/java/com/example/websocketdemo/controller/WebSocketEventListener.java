@@ -11,9 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import java.util.HashSet;
-
-import static com.example.websocketdemo.controller.GameController.players;
+import static com.example.websocketdemo.controller.GameController.lobbys;
 
 @Component
 public class WebSocketEventListener {
@@ -39,7 +37,8 @@ public class WebSocketEventListener {
             ConnectInfo info = new ConnectInfo();
             info.setType(ConnectInfo.ConnectingType.LEAVE);
             info.setSender(username);
-            messagingTemplate.convertAndSend("/topic/public", info);
+
+            messagingTemplate.convertAndSend("/topic/public/"+  lobbys.get(username).getName(), info);
         }
     }
 }

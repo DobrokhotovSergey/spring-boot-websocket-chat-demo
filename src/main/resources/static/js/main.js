@@ -21,9 +21,6 @@ $('#move').hide();
 
 function connect(event) {
     username = document.querySelector('#name').value.trim();
-    if(username == 'a'){
-        $('#move').show();
-    }
     $('#user-name-id').text(username);
     if(username) {
         usernamePage.classList.add('hidden');
@@ -32,7 +29,7 @@ function connect(event) {
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
 
-        stompClient.connect({}, onConnected, onError);
+        stompClient.connect({name: username}, onConnected, onError);
         stompClient.debug = null;
     }
 
@@ -46,29 +43,34 @@ function connectToRoom(info){
     $('#lobby-container').show();
     var message = JSON.parse(info.body);
     var lobbyPlayers = '';
+    var messageElement = document.createElement('li');
     message.allPlayers.forEach(function(item, i, arr){
-        lobbyPlayers+='<li class="fa fa-user list-group-item" style="color: '+ getAvatarColor(item)+'"> '+item+' </li>';
+        lobbyPlayers+='<li class="fa fa-user list-group-item" style="color: '+ getAvatarColor(item.sender)+'"> '+item.sender+' </li>';
     });
     $('#list-lobby').html(lobbyPlayers);
-    console.log(message.allPlayers);
 
-    var messageElement = document.createElement('li');
+    $('#messageArea').empty();
 
-    if(message.type === 'JOIN') {
-        messageElement.classList.add('event-message');
-        message.content = message.sender + ' joined!';
-    } else if (message.type === 'LEAVE') {
-        messageElement.classList.add('event-message');
-        message.content = message.sender + ' left!';
-    }
-    var textElement = document.createElement('p');
-    var messageText = document.createTextNode(message.content);
-    textElement.appendChild(messageText);
+    message.allPlayers.forEach(function(item, i, arr){
+        console.log(item);
+        if(item.type === 'JOIN') {
+            messageElement.classList.add('event-message');
+            item.content = item.sender + ' присоединился!';
+        } else if (item.type === 'LEAVE') {
+            messageElement.classList.add('event-message');
+            item.content = item.sender + ' вышел!';
+        }
+        var textElement = document.createElement('p');
+        var messageText = document.createTextNode(item.content);
+        textElement.appendChild(messageText);
 
-    messageElement.appendChild(textElement);
+        messageElement.appendChild(textElement);
 
-    messageArea.appendChild(messageElement);
-    messageArea.scrollTop = messageArea.scrollHeight;
+        messageArea.appendChild(messageElement);
+        messageArea.scrollTop = messageArea.scrollHeight;
+    });
+
+
 }
 var findGameTable = $('#findGame-table').DataTable({
     destroy: true,
@@ -78,48 +80,19 @@ var findGameTable = $('#findGame-table').DataTable({
 $('#findGame-table tbody').on('click', 'tr td .join-btn', function(e){
     var data = findGameTable.row( $(this).parents('tr') ).data();
     console.log(data);
-    stompClient.send("/app/room/"+data[0], {}, JSON.stringify({sender: username, type: 'JOIN'}));
-    stompClient.subscribe('/topic/room/{room}', function(info) {
-        $('#findGame-modal').modal('hide');
-        $('#menu-after-connected').hide();
-        connectToRoom(info);
-    });
+    stompClient.send("/app/room/"+data[1], {}, JSON.stringify({sender: username, type: 'JOIN'}));
+
     e.preventDefault();
 });
 
 $('#findGame-btn').on('click', function(e){
     stompClient.send("/app/getrooms/"+username, {}, {});
-    stompClient.subscribe('/topic/getrooms/{user}', function(info) {
-        $('#findGame-modal').modal('show');
-
-      var data = JSON.parse(info.body);
-      console.log(data);
-        findGameTable.clear().draw();
-        var rows = [];
-        data.forEach(function(item, i, arr) {
-            rows[i] = [item.name, item.owner, '<button type="button" class="join-btn" class="btn btn-default">клик</button>'];
-        });
-        findGameTable.rows.add(rows).draw();
-    });
     e.preventDefault();
 });
 
 $('#createGame-modal-btn').on('click', function(e){
-
     var gameName = $('#createGame-input').val();
-    stompClient.send("/app/create/"+gameName, {}, JSON.stringify({sender: username, type: 'JOIN'})
-    );
-    stompClient.subscribe('/topic/create/{room}', function(info) {
-        $('#createGame-modal').modal('hide');
-        $('#menu-after-connected').hide();
-        console.log(info);
-        connectToRoom(info);
-    });
-
-    stompClient.subscribe('/topic/room/{room}', function(info) {
-        connectToRoom(info);
-    });
-
+    stompClient.send("/app/create/"+gameName, {}, JSON.stringify({sender: username, type: 'JOIN'}));
     e.preventDefault();
 });
 
@@ -131,11 +104,35 @@ function onConnected() {
 
     $('#menu-after-connected').show();
 
-    // Subscribe to the Public Topic
-    // stompClient.subscribe('/topic/public', onMessageReceived);
-    // stompClient.subscribe('/topic/public/start', startGame);
+    stompClient.subscribe('/user/topic/create/{room}', function(info) {
+        $('#createGame-modal').modal('hide');
+        $('#menu-after-connected').hide();
+        connectToRoom(info);
+    });
 
-    // Tell your username to the server
+    stompClient.subscribe('/topic/room/{room}', function(info) {
+        console.log(JSON.stringify(info.body));
+        $('#findGame-modal').modal('hide');
+        $('#menu-after-connected').hide();
+        connectToRoom(info);
+    });
+
+    stompClient.subscribe('/user/topic/getrooms/{user}', function(info) {
+        $('#findGame-modal').modal('show');
+        var data = JSON.parse(info.body);
+        findGameTable.clear().draw();
+        var rows = [];
+        data.forEach(function(item, i, arr) {
+            rows[i] = [item.name, item.owner.sender, '<button type="button" class="join-btn" class="btn btn-default">клик</button>'];
+        });
+        findGameTable.rows.add(rows).draw();
+    });
+
+
+    stompClient.subscribe('/topic/public/{room}', function(info) {
+       console.log(info);
+    });
+
     stompClient.send("/app/chat.addUser", {}, JSON.stringify({sender: username, type: 'JOIN'}));
 
 

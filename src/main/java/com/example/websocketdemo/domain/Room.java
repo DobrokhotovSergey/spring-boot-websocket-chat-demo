@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Room {
     private String name;
-    private String owner;
+    private ConnectInfo owner;
+    private Set<ConnectInfo> allPlayers;
 }

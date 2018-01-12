@@ -13,7 +13,10 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 @Controller
 public class GameController {
@@ -23,14 +26,11 @@ public class GameController {
 
     private SimpMessagingTemplate template;
 
-    public static Set<String> players = new HashSet<>();
-    private Set<Room> lobbys = new HashSet<>();
+    public static Map<String, Room> lobbys = new HashMap<>();
 
     @MessageMapping("/chat.addUser")
-    @SendTo("/topic/public")
-    public ConnectInfo addUser(@Payload ConnectInfo info, SimpMessageHeaderAccessor headerAccessor) {
+    public void addUser(@Payload ConnectInfo info, SimpMessageHeaderAccessor headerAccessor) {
         headerAccessor.getSessionAttributes().put("username", info.getSender());
-        return info;
     }
 
     @Autowired
@@ -38,37 +38,29 @@ public class GameController {
         this.template = template;
     }
 
-    @MessageMapping("/getrooms/{user}")
-    public void getAllRoom(@DestinationVariable("user") String user){
-        this.template.convertAndSend("/topic/getrooms/"+user, lobbys);
+    @MessageMapping("/getrooms/{selectedLobby}")
+    public void getAllRoom(@DestinationVariable("selectedLobby") String selectedLobby, User user){
+        this.template.convertAndSendToUser(user.getName(), "/topic/getrooms/"+user, lobbys.values());
     }
 
     @MessageMapping("/create/{room}")
-    public void createRoom(@DestinationVariable("room") String room, @Payload ConnectInfo info) throws Exception {
-        Room r = new Room(room, info.getSender());
-        players.add(info.getSender());
-        info.setAllPlayers(players);
-        if(!lobbys.contains(r)){
-            lobbys.add(r);
-        }else{
-            System.out.println("lobbys contains this room!");
-        }
-        this.template.convertAndSend("/topic/create/"+room, info);
+    public void createRoom(@DestinationVariable("room") String room, @Payload ConnectInfo owner, User user) throws Exception {
+        Room r = new Room(room, owner,  new HashSet<>(Arrays.asList(owner)));
+        lobbys.put(user.getName(), r);
+        this.template.convertAndSendToUser(user.getName(), "/topic/create/"+room, r);
     }
 
     @MessageMapping("/room/{room}")
-    public void connectToRoom(@DestinationVariable("room") String room, @Payload ConnectInfo info) throws Exception {
-        System.out.println(room);
-        System.out.println(info);
-        players.add(info.getSender());
-        info.setAllPlayers(players);
-        this.template.convertAndSend("/topic/room/"+room, info);
+    public void connectToRoom(@DestinationVariable("room") String room, @Payload ConnectInfo info, User user) throws Exception {
+        lobbys.get(room).getAllPlayers().add(info);
+        this.template.convertAndSend("/topic/room/"+room, lobbys.get(room));
     }
 
     @MessageMapping("/startGame")
     @SendTo("/topic/public/start")
     public GameField start(){
-        return new GameProcessing().start(new ArrayList<>(players));
+        return null;
+//        return new GameProcessing().start(new ArrayList<>(players));
     }
 
 //    @MessageMapping("/move")
