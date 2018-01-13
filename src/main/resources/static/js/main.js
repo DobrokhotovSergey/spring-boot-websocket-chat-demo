@@ -152,7 +152,7 @@ function onConnected() {
         if(data.start){
             $("#countdown").countdown360({
                 radius      : 60,
-                seconds     : 5,
+                seconds     : 1,
                 fontColor   : '#FFFFFF',
                 autostart   : false,
                 label       : false,
