@@ -157,7 +157,9 @@ function onConnected() {
                 autostart   : false,
                 label       : false,
                 onComplete  : function () {
-                    console.log('BEGIN')
+                    $("#countdown").hide();
+                    $('#lobby-container').hide();
+                    $('#inventory').show();
                     return false;
                 }
                 }).start()

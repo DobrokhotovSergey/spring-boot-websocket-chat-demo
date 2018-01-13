@@ -50,6 +50,7 @@ public class WebSocketEventListener {
                         roomName = room.getName();
                         infos = info;
                         messagingTemplate.convertAndSend("/topic/public/"+  roomName, infos);
+                        connectInfo.setReady(false);
                         i.remove();
                         if(room.getAllPlayers().size()==0){
                             lobbys.remove(room.getOwner().getSender());
