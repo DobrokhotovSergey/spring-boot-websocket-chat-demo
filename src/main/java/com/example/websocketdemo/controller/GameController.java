@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
 public class GameController {
@@ -27,7 +28,7 @@ public class GameController {
 
     private SimpMessagingTemplate template;
 
-    public static Map<String, Room> lobbys = new HashMap<>();
+    public static Map<String, Room> lobbys = new ConcurrentHashMap<>();
 
     @MessageMapping("/chat.addUser")
     public void addUser(@Payload ConnectInfo info, SimpMessageHeaderAccessor headerAccessor) {
@@ -47,7 +48,9 @@ public class GameController {
     @MessageMapping("/create/{room}")
     public void createRoom(@DestinationVariable("room") String room, @Payload ConnectInfo owner, User user) throws Exception {
         Room r = new Room(room, owner,  new HashSet<>(Arrays.asList(owner)), false);
+
         lobbys.put(user.getName(), r);
+        System.out.println(lobbys);
         this.template.convertAndSendToUser(user.getName(), "/topic/create/"+room, r);
     }
 

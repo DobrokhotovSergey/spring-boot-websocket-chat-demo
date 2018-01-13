@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import static com.example.websocketdemo.controller.GameController.lobbys;
 
 @Component
@@ -32,16 +35,27 @@ public class WebSocketEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String username = (String) headerAccessor.getSessionAttributes().get("username");
         if(username != null) {
+            String roomName = null;
+            ConnectInfo infos = null;
             logger.info("User Disconnected : " + username);
             for(Room room: lobbys.values()){
-                for(ConnectInfo connectInfo: room.getAllPlayers()){
-                   if( connectInfo.getSender().equals(username)){
-                       ConnectInfo info = new ConnectInfo();
-                       info.setType(ConnectInfo.ConnectingType.LEAVE);
-                       info.setSender(username);
-                       room.getAllPlayers().remove(connectInfo);
-                       messagingTemplate.convertAndSend("/topic/public/"+  room.getName(), info);
-                   }
+                Set<ConnectInfo> setInfo = room.getAllPlayers();
+                Iterator<ConnectInfo> i = setInfo.iterator();
+                while (i.hasNext()) {
+                    ConnectInfo connectInfo = i.next();
+                    if( connectInfo.getSender().equals(username)){
+                        ConnectInfo info = new ConnectInfo();
+                        info.setType(ConnectInfo.ConnectingType.LEAVE);
+                        info.setSender(username);
+                        roomName = room.getName();
+                        infos = info;
+                        messagingTemplate.convertAndSend("/topic/public/"+  roomName, infos);
+                        i.remove();
+                        if(room.getAllPlayers().size()==0){
+                            lobbys.remove(room.getOwner().getSender());
+                        }
+
+                    }
                 }
             }
         }

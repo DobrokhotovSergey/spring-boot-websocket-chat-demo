@@ -44,7 +44,10 @@ function connectToRoom(info){
     $('#lobby-container').show();
     var lobbyPlayers = '';
     var messageElement = document.createElement('li');
-    stompClient.subscribe('/topic/public/'+$('#lobby-id').text(), function(i) {
+    var message = JSON.parse(info.body);
+    $('#lobby-id').text(message.name);
+    stompClient.subscribe('/topic/public/'+message.name, function(i) {
+        $('#messageArea').empty();
         var t = JSON.parse(i.body);
         if(t.type === 'LEAVE'){
             t.content = t.sender + ' вышел!';
@@ -59,8 +62,7 @@ function connectToRoom(info){
         var leave = '#lobby-player-' + t.sender;
         $(leave).remove();
     });
-    var message = JSON.parse(info.body);
-    $('#lobby-id').text(message.name);
+
 
 
     message.allPlayers.forEach(function(item, i, arr){
@@ -155,7 +157,9 @@ function onConnected() {
                 autostart   : false,
                 label       : false,
                 onComplete  : function () {
-                    console.log('BEGIN') }
+                    console.log('BEGIN')
+                    return false;
+                }
                 }).start()
 
         }
