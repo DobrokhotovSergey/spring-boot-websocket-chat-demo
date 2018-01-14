@@ -14,10 +14,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
@@ -47,7 +44,7 @@ public class GameController {
 
     @MessageMapping("/create/{room}")
     public void createRoom(@DestinationVariable("room") String room, @Payload ConnectInfo owner, User user) throws Exception {
-        Room r = new Room(room, owner,  new HashSet<>(Arrays.asList(owner)), false);
+        Room r = new Room(room, owner,  new HashSet<>(Arrays.asList(owner)), false, null);
 
         lobbys.put(user.getName(), r);
         System.out.println(lobbys);
@@ -74,8 +71,10 @@ public class GameController {
             }
         }
         boolean start = true;
+        Set<ConnectInfo> setPlayers = null;
         for(Room room1: lobbys.values()){
             if(room1.getName().equals(room)){
+                setPlayers = room1.getAllPlayers();
                 for(ConnectInfo connectInfo: room1.getAllPlayers()){
                     if(!connectInfo.isReady()){
                         start = false;
@@ -85,15 +84,12 @@ public class GameController {
         }
         Room r = lobbys.get(owner);
         r.setStart(start);
+        if(start){
+            r.setProcessing(new GameProcessing().start(setPlayers));
+        }
         this.template.convertAndSend("/topic/ready/"+room, r);
     }
 
-    @MessageMapping("/startGame")
-    @SendTo("/topic/public/start")
-    public GameField start(){
-        return null;
-//        return new GameProcessing().start(new ArrayList<>(players));
-    }
 
 //    @MessageMapping("/move")
 //    @SendTo("/topic/public")

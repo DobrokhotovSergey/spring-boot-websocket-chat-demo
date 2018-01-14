@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -14,12 +15,13 @@ public class GameProcessing extends AbstractGameProcessing {
 
     private static final int NUMBER_DOOR_CARD_ON_START =4;
     private static final int NUMBER_TREASURE_CARD_ON_START =4;
-    private static List<Card> doorsInGames = InitializeCards.doors;
+    private static List<Door> doorsInGames = InitializeCards.doors;
 
 
-    public GameField start(List<String> list){
+
+    public GameField start(Set<ConnectInfo> list){
         initializeCard();
-        List<Player> playerList = initializePlayers(list);
+        List<Player> playerList = initializePlayers(new ArrayList<ConnectInfo>(list));
 
         GameField gameField = new GameField(playerList, doorsInGames, null);
 
@@ -37,7 +39,7 @@ public class GameProcessing extends AbstractGameProcessing {
 
 
     @Override
-    List<Player> initializePlayers(List<String> playerList) {
+    List<Player> initializePlayers(List<ConnectInfo> playerList) {
         List<Player> players = new ArrayList<>();
 
         //Каждый игрок получает по 4 карты двери
@@ -48,7 +50,7 @@ public class GameProcessing extends AbstractGameProcessing {
                 doorsInGames.remove(0);
             }
 
-            players.add(new Player(playerList.get(i), 1, false, cardList, null));
+            players.add(new Player(playerList.get(i).getSender(), 1, false, cardList, null));
         }
 
 

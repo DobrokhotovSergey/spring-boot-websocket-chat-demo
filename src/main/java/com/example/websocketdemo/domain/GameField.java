@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 public class GameField {
 
     private List<Player> players;
-    private List<Card> monsters;
+    private List<Door> monsters;
     private List<Truesure> truesures;
 
 

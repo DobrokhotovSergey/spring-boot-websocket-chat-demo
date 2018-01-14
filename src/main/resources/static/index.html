@@ -17,6 +17,7 @@
       <link href="/css/font-awesome.css" rel="stylesheet">
       <script src="/js/jquery.countdown360.js"></script>
       <link rel="stylesheet" href="/css/main.css" />
+      <link rel="stylesheet" href="/css/test.css" />
   </head>
   <body>
   <div class="modal fade" id="createGame-modal" role="dialog">
@@ -104,6 +105,21 @@
           </div>
       </div>
   </div>
+  <div class="container">
+      <ul class="dungeon-card" style="display: none">
+          <li class="treasure"></li>
+          <li class="door"></li>
+      </ul>
+  </div>
+
+  <div class="container" id="playerCards" style="display: none">
+      <ul class="dungeon-card" id="playerCards-ul">
+          <!--<li class="door"></li>-->
+          <!--<li class="door"></li>-->
+          <!--<li class="door"></li>-->
+          <!--<li class="door"></li>-->
+      </ul>
+  </div>
 
 
   <table id="inventory" style="display: none">
@@ -154,7 +170,7 @@
 
                 <!--<button id="move">MOVE</button>-->
                 <div id="user-name-id"></div>
-                <div id="countdown"></div>
+                <div id="countdown" class="text-center"></div>
 
             </div>
             <div class="connecting">
@@ -164,7 +180,7 @@
         </div>
     </div>
 
-
+  <script src="/js/test.js"></script>
 
     <script src="/js/main.js"></script>
 

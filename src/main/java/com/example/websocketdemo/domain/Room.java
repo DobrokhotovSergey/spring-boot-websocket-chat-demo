@@ -1,5 +1,6 @@
 package com.example.websocketdemo.domain;
 
+import com.example.websocketdemo.service.GameProcessing;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,4 +15,5 @@ public class Room {
     private ConnectInfo owner;
     private Set<ConnectInfo> allPlayers;
     private boolean start;
+    private GameField processing;
 }

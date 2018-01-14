@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Card implements Cloneable{
+public abstract class Card implements Cloneable{
     private int id;
     private String name;
     private String description;

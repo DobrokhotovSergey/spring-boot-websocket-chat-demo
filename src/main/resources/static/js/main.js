@@ -125,6 +125,10 @@ $('#start-newGame-btn').on('click', function(e){
     stompClient.send("/app/ready/"+roomId, {}, {});
     e.preventDefault();
 });
+
+
+
+var processing= null;
 function onConnected() {
 
     $('#menu-after-connected').show();
@@ -143,31 +147,69 @@ function onConnected() {
 
     stompClient.subscribe('/topic/ready/{room}', function(info) {
         var data = JSON.parse(info.body);
+        processing = data.processing;
 
         data.allPlayers.forEach(function(item, i, arr) {
             if(item.ready){
                  $('#lobby-player-'+item.sender).css("background-color", "#afd896");
+                 $('#playerCards').show();
             }
         });
         if(data.start){
             $("#countdown").countdown360({
                 radius      : 60,
                 seconds     : 1,
-                fontColor   : '#FFFFFF',
+                fontColor   : '#F9D99C',
+                strokeStyle: "#4B0000",
+                fillStyle: "#CC812F",
                 autostart   : false,
                 label       : false,
                 onComplete  : function () {
                     $("#countdown").hide();
                     $('#lobby-container').hide();
-                    $('#inventory').show();
+                    // $('#inventory').show();
+
+
+                    processing.players.forEach(function (player) {
+                        if(player.name==username){
+
+                            // var images = player.hiddenCard;
+                            // var li = $( '<li/>' );
+                            // var ul = $( '#playerCards-ul > ul' );
+                            // $.each( images, function( i, v ) {
+                            //     $( 'ul#playerCards-ul > li' ).html( '<img src="../images/doors/' + v.id + '.jpg"/>' );
+                            // });
+                            $( function() {
+
+                                var hiddenCard = player.hiddenCard;
+                                console.log(hiddenCard);
+                                var li = $('<li class="door"/>'),
+                                    ul = $('#playerCards-ul');
+                                hiddenCard.forEach(function (t) {
+                                    ul.append(li.clone().html( '<img style="-webkit-transform: rotateY(180deg); "width="193" height="312" src="../images/doors/' + t.id + '.jpg"/>' ));
+                                });
+                            });
+//.html('<img src="../images/doors/' + t.id + '.jpg"/>
+
+
+
+
+                        }
+                    });
+                    $("#playerCards-ul li").on('click', function(){
+                        $(this).toggleClass("flipped");
+
+
+
+                        console.log(processing);
+                        setTimeout(function () {
+                        }, 1000);
+                    });
                     return false;
                 }
                 }).start()
-
         }
-
-
-        });
+    });
 
     stompClient.subscribe('/user/topic/getrooms/{user}', function(info) {
         $('#findGame-modal').modal('show');
