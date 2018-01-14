@@ -181,13 +181,22 @@ function onConnected() {
                             // });
                             $( function() {
 
-                                var hiddenCard = player.hiddenCard;
-                                console.log(hiddenCard);
+                                var hiddenDoors = player.hiddenDoors;
+                                console.log(hiddenDoors);
                                 var li = $('<li class="door"/>'),
                                     ul = $('#playerCards-ul');
-                                hiddenCard.forEach(function (t) {
+                                hiddenDoors.forEach(function (t) {
                                     ul.append(li.clone().html( '<img style="-webkit-transform: rotateY(180deg); "width="193" height="312" src="../images/doors/' + t.id + '.jpg"/>' ));
                                 });
+
+                                var hiddenTreasures = player.hiddenTreasures;
+                                console.log(hiddenTreasures);
+                                var liT = $('<li class="treasure"/>'),
+                                    ulT = $('#playerCards-treasure-ul');
+                                hiddenTreasures.forEach(function (t) {
+                                    ulT.append(liT.clone().html( '<img style="-webkit-transform: rotateY(180deg); "width="193" height="312" src="../images/treasures/' + t.id + '.jpg"/>' ));
+                                });
+
                             });
 //.html('<img src="../images/doors/' + t.id + '.jpg"/>
 
@@ -196,7 +205,7 @@ function onConnected() {
 
                         }
                     });
-                    $("#playerCards-ul li").on('click', function(){
+                    $(".dungeon-card li").on('click', function(){
                         $(this).toggleClass("flipped");
 
 

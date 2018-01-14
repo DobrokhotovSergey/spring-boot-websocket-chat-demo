@@ -14,7 +14,9 @@ public class Player {
     private int level;
     boolean moving;
 
-    private List<Card> hiddenCard;
+    private List<Door> hiddenDoors;
+
+    private List<Treasure> hiddenTreasures;
     private List<Card> openedCard;
 
     public enum Classes{

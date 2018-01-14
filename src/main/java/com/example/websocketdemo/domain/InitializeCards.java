@@ -1,17 +1,40 @@
 package com.example.websocketdemo.domain;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class InitializeCards {
 
+    public final List<Treasure> treasures = Collections.unmodifiableList(Arrays.asList(
+            new Treasure(10001), new Treasure(10002), new Treasure(10003), new Treasure(10004),
+            new Treasure(10005), new Treasure(10006), new Treasure(10007), new Treasure(10008),
+            new Treasure(10009), new Treasure(10010), new Treasure(100011), new Treasure(10012),
+            new Treasure(10013), new Treasure(10014), new Treasure(10015), new Treasure(10016),
+
+            new Treasure(10017), new Treasure(10018), new Treasure(10019), new Treasure(10020),
+            new Treasure(10021), new Treasure(10022), new Treasure(10023), new Treasure(10024),
+            new Treasure(10025), new Treasure(10026), new Treasure(10027), new Treasure(10028),
+            new Treasure(10029), new Treasure(10030), new Treasure(10031), new Treasure(10032),
+
+            new Treasure(10033), new Treasure(10034), new Treasure(10035), new Treasure(10036),
+            new Treasure(10037), new Treasure(10038), new Treasure(10039), new Treasure(10040),
+            new Treasure(10041), new Treasure(10042), new Treasure(10043), new Treasure(10044),
+            new Treasure(10045), new Treasure(10046), new Treasure(10047), new Treasure(10048),
+
+            new Treasure(10049), new Treasure(10050), new Treasure(10051), new Treasure(10052),
+            new Treasure(10053), new Treasure(10054), new Treasure(10055), new Treasure(10056),
+            new Treasure(10057), new Treasure(10058), new Treasure(10059), new Treasure(10060),
+            new Treasure(10061), new Treasure(10062), new Treasure(10063), new Treasure(10064),
+
+            new Treasure(10065), new Treasure(10066), new Treasure(10067), new Treasure(10068),
+            new Treasure(10069), new Treasure(10070), new Treasure(10071), new Treasure(10072),
+            new Treasure(10073), new Treasure(10074), new Treasure(10075)
+    ));
 
 
     public final List<Door> doors = Collections.unmodifiableList(Arrays.asList(
-            new Door(1), new Door(2),new Door(3),new Door(4)
-            ,
+            new Door(1), new Door(2),new Door(3),new Door(4),
             new Door(5), new Door(6),new Door(7),new Door(8),
             new Door(9), new Door(10),new Door(11),new Door(12),
             new Door(13), new Door(14),new Door(15),new Door(16),
@@ -35,9 +58,7 @@ public class InitializeCards {
             new Door(85), new Door(86),new Door(87),new Door(88),
             new Door(89), new Door(90),new Door(91),new Door(92),
             new Door(91), new Door(92),new Door(93),new Door(94),
-            new Door(95)
-
-            ));
+            new Door(95)));
 
 
 

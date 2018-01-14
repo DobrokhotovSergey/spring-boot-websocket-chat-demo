@@ -15,7 +15,6 @@
     font-size: 72px;
     background: white;
     border: 1px solid black;
-    border-radius: 20px;
     cursor: pointer;
     -webkit-transform: rotateY(0deg);
     -webkit-transform-style: preserve-3d;
@@ -33,14 +32,13 @@
     content: "";
     width: 100%;
     height: 100%;
-    border-radius: 20px;
     -webkit-backface-visibility: hidden;
 }
 
 .dungeon-card .door:after{
-    background: url("../images/door.png");
+    background: url("../images/door.jpg");
 }
 
 .dungeon-card .treasure:after{
-    background: url("../images/treasure.png");
+    background: url("../images/treasure.jpg");
 }

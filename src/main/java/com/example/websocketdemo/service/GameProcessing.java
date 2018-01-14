@@ -16,16 +16,19 @@ public class GameProcessing extends AbstractGameProcessing {
     private static final int NUMBER_DOOR_CARD_ON_START =4;
     private static final int NUMBER_TREASURE_CARD_ON_START =4;
     private List<Door> doorsInGames = new ArrayList<>();
+    private List<Treasure> treasureInGames = new ArrayList<>();
 
 
 
     public GameField start(Set<ConnectInfo> list){
 
         doorsInGames = new ArrayList<>(new InitializeCards().doors);
+        treasureInGames =  new ArrayList<>(new InitializeCards().treasures);
+
         initializeCard();
         List<Player> playerList = initializePlayers(new ArrayList<ConnectInfo>(list));
 
-        GameField gameField = new GameField(playerList, doorsInGames, null);
+        GameField gameField = new GameField(playerList, doorsInGames, treasureInGames);
 
         return gameField;
     }
@@ -35,6 +38,7 @@ public class GameProcessing extends AbstractGameProcessing {
 
     @Override
     void initializeCard() {
+        Collections.shuffle(treasureInGames);
         Collections.shuffle(doorsInGames);
     }
 
@@ -46,13 +50,19 @@ public class GameProcessing extends AbstractGameProcessing {
 
         //Каждый игрок получает по 4 карты двери
         for(int i=0;i<playerList.size();i++){
-            List<Card> cardList = new ArrayList<>();
+            List<Door> listDoors = new ArrayList<>();
+
+            List<Treasure> listTreasures = new ArrayList<>();
             for(int j =0; j < NUMBER_DOOR_CARD_ON_START; j++){
-                cardList.add(doorsInGames.get(0));
+                listDoors.add(doorsInGames.get(0));
                 doorsInGames.remove(0);
             }
+            for(int j =0; j < NUMBER_TREASURE_CARD_ON_START; j++){
+                listTreasures.add(treasureInGames.get(0));
+                treasureInGames.remove(0);
+            }
 
-            players.add(new Player(playerList.get(i).getSender(), 1, false, cardList, null));
+            players.add(new Player(playerList.get(i).getSender(), 1, false, listDoors, listTreasures, null));
         }
 
 

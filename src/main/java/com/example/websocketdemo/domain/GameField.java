@@ -12,7 +12,7 @@ public class GameField {
 
     private List<Player> players;
     private List<Door> monsters;
-    private List<Truesure> truesures;
+    private List<Treasure> truesures;
 
 
 }
