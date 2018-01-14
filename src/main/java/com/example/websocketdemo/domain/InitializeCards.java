@@ -2,15 +2,16 @@ package com.example.websocketdemo.domain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class InitializeCards {
 
 
 
-
-    public static final List<Door> doors = new ArrayList<Door>(Arrays.asList(
-            new Door(1), new Door(2),new Door(3),new Door(4),
+    public final List<Door> doors = Collections.unmodifiableList(Arrays.asList(
+            new Door(1), new Door(2),new Door(3),new Door(4)
+            ,
             new Door(5), new Door(6),new Door(7),new Door(8),
             new Door(9), new Door(10),new Door(11),new Door(12),
             new Door(13), new Door(14),new Door(15),new Door(16),

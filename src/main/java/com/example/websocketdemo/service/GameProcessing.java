@@ -15,11 +15,13 @@ public class GameProcessing extends AbstractGameProcessing {
 
     private static final int NUMBER_DOOR_CARD_ON_START =4;
     private static final int NUMBER_TREASURE_CARD_ON_START =4;
-    private static List<Door> doorsInGames = InitializeCards.doors;
+    private List<Door> doorsInGames = new ArrayList<>();
 
 
 
     public GameField start(Set<ConnectInfo> list){
+
+        doorsInGames = new ArrayList<>(new InitializeCards().doors);
         initializeCard();
         List<Player> playerList = initializePlayers(new ArrayList<ConnectInfo>(list));
 

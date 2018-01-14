@@ -85,7 +85,7 @@ public class GameController {
         Room r = lobbys.get(owner);
         r.setStart(start);
         if(start){
-            r.setProcessing(new GameProcessing().start(setPlayers));
+            r.setProcessing(gameProcessing.start(setPlayers));
         }
         this.template.convertAndSend("/topic/ready/"+room, r);
     }
